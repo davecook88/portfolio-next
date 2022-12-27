@@ -25,7 +25,10 @@ If the letter does not exist, its value will be -2
 */
   const [wordleClues, setWordleClues] = useState(
     lowerCaseAlphabet.reduce((map, letter) => {
-      map[letter] = { status: LETTER_STATUS.UNKNOWN, index: null };
+      map[letter.toUpperCase()] = {
+        status: LETTER_STATUS.UNKNOWN,
+        index: null,
+      };
       return map;
     }, {} as WordleClueMap)
   );
@@ -46,12 +49,20 @@ If the letter does not exist, its value will be -2
     return filterFunctions;
   }, [wordleClues]);
 
-  const getSuggestions = useCallback(() => {
+  // const orderSuggestions = (word1: Word[], word2: Word[]) => {
+  //   const
+  // };
+
+  const suggestions = useMemo(() => {
     const filterFunctions = getFilterFunctions();
+    if (!filterFunctions.length) return allWords;
     const filteredWords = allWords.filter((word) => {
-      return Boolean(filterFunctions.find((func) => func(word)));
+      const falseFunction = filterFunctions.find((func) => {
+        return !func(word);
+      });
+      return Boolean(!falseFunction);
     });
-    return filteredWords.map((w) => w.string);
+    return filteredWords;
   }, [getFilterFunctions, allWords]);
 
   const setClue = (letter: Letter) => (clue: WordleClueEntry) => {
@@ -65,7 +76,7 @@ If the letter does not exist, its value will be -2
   };
 
   return {
-    getSuggestions,
+    suggestions,
     setClue,
     getClue,
   };

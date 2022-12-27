@@ -1,26 +1,22 @@
 import clsx from 'clsx';
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 
-import { WordleClueContext } from '@/components/wordle';
 import { LETTER_STATUS } from '@/components/wordle/constants/letterStatus';
 import { LetterBoxProps } from '@/components/wordle/LetterBox/types';
 
-export const LetterBox: FC<LetterBoxProps> = ({ letter = '', index }) => {
-  const context = useContext(WordleClueContext);
-
-  if (!context) return null;
-  const { getClue, setClue } = context;
-  const setLetterClue = setClue(letter);
-
-  const clueState = getClue(letter);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-
+export const LetterBox: FC<LetterBoxProps> = ({
+  letter = '',
+  index,
+  clue,
+  setLetterClue,
+  activeGuess,
+}) => {
   const clickHandler = () => {
-    console.log({ clueState });
-    if (!clueState) {
+    if (!letter || !clue || !setLetterClue) return;
+    if (!clue) {
       return setLetterClue({ status: LETTER_STATUS.IN_WORD, index: null });
     }
-    switch (clueState.status) {
+    switch (clue.status) {
       case LETTER_STATUS.UNKNOWN:
         return setLetterClue({ status: LETTER_STATUS.IN_WORD, index: null });
       case LETTER_STATUS.IN_WORD:
@@ -35,7 +31,10 @@ export const LetterBox: FC<LetterBoxProps> = ({ letter = '', index }) => {
 
   return (
     <div
-      className='cursor-pointer border border-white'
+      className={clsx(
+        'm-1 cursor-pointer border border-white',
+        activeGuess && 'bg-white'
+      )}
       onClick={(e) => {
         e.preventDefault();
         clickHandler();
@@ -43,17 +42,17 @@ export const LetterBox: FC<LetterBoxProps> = ({ letter = '', index }) => {
     >
       <div
         className={clsx(
-          'flex h-8 w-8 select-none items-center justify-center bg-transparent text-center	',
+          'flex  h-8 w-8 select-none items-center justify-center bg-transparent text-center',
 
-          clueState?.status === LETTER_STATUS.INDEX_KNOWN &&
-            clueState?.index === index &&
-            'bg-success',
-          (clueState?.status === LETTER_STATUS.IN_WORD ||
-            clueState?.status === LETTER_STATUS.INDEX_KNOWN) &&
-            'bg-warning'
+          clue?.status === LETTER_STATUS.INDEX_KNOWN && clue?.index === index
+            ? 'bg-success'
+            : clue?.status === LETTER_STATUS.IN_WORD ||
+              clue?.status === LETTER_STATUS.INDEX_KNOWN
+            ? 'bg-warning'
+            : null
         )}
       >
-        {letter}
+        <div>{letter}</div>
       </div>
     </div>
   );

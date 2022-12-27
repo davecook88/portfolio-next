@@ -2,15 +2,27 @@ export class Word {
   string: string;
   letterMap: Map<Index, Letter>;
   lettersSet: Set<Letter>;
+  multiLetters: Set<Letter> | null;
 
   constructor(word: string) {
     this.string = word;
-    const lettersArray = word.split('');
+    this.multiLetters = null;
+    const lettersArray = word.split('').map((l) => l.toUpperCase());
     this.lettersSet = this.getLettersSet(lettersArray);
     this.letterMap = this.getLettersMap(lettersArray);
   }
 
   private getLettersSet(letters: Letter[]) {
+    const set = new Set();
+    letters.forEach((l) => {
+      if (set.has(l)) {
+        if (!this.multiLetters) {
+          this.multiLetters = new Set();
+        }
+        this.multiLetters.add(l);
+      }
+      set.add(l);
+    });
     return new Set(letters);
   }
 
