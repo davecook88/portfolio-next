@@ -12,7 +12,6 @@ import { Wordmap } from '@/components/wordle/WordMap';
 
 export const useWordleClues = () => {
   const allWords = useMemo(() => {
-    return [];
     return new Wordmap(WORD_LIST).words;
   }, []);
 
@@ -25,16 +24,15 @@ If the letter exists but has no known index, its value will be -1
 If the letter does not exist, its value will be -2
 */
   const [wordleClues, setWordleClues] = useState(
-    lowerCaseAlphabet.reduce(
-      (map, letter) =>
-        map.set(letter, { status: LETTER_STATUS.UNKNOWN, index: null }),
-      new Map() as WordleClueMap
-    )
+    lowerCaseAlphabet.reduce((map, letter) => {
+      map[letter] = { status: LETTER_STATUS.UNKNOWN, index: null };
+      return map;
+    }, {} as WordleClueMap)
   );
 
   const getFilterFunctions = useCallback(() => {
     const filterFunctions: Array<(word: Word) => boolean> = [];
-    for (const [letter, clue] of wordleClues) {
+    for (const [letter, clue] of Object.entries(wordleClues)) {
       if (clue.status === LETTER_STATUS.INDEX_KNOWN && clue.index !== null) {
         filterFunctions.push((word: Word) =>
           word.hasAtIndex(letter)(clue.index as number)
@@ -58,13 +56,12 @@ If the letter does not exist, its value will be -2
 
   const setClue = (letter: Letter) => (clue: WordleClueEntry) => {
     setWordleClues((prev) => {
-      prev.set(letter, clue);
-      return prev;
+      return { ...prev, [letter]: clue };
     });
   };
 
   const getClue = (letter: Letter) => {
-    return wordleClues.get(letter) as WordleClueEntry;
+    return wordleClues[letter] as WordleClueEntry;
   };
 
   return {

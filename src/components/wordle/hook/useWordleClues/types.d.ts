@@ -5,7 +5,7 @@ export type WordleClueEntry = {
   index: number | null;
 };
 
-export type WordleClueMap = Map<
+export type WordleClueMap = Record<
   Letter,
   {
     status: LETTER_STATUS;
