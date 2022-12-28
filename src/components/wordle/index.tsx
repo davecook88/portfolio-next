@@ -26,9 +26,10 @@ const WordleGame = () => {
         .map((guess) => guess.join('').toLowerCase())
     );
     return suggestions
-      .slice(0, 20)
+      .slice(0, 30)
       .filter((word) => !previousGuessesSet.has(word.string))
-      .slice(0, 10);
+      .slice(0, 20);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guessCount, suggestions]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

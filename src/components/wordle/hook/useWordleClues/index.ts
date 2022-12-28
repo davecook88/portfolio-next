@@ -7,6 +7,7 @@ import {
   WordleClueEntry,
   WordleClueMap,
 } from '@/components/wordle/hook/useWordleClues/types';
+import { orderSuggestions } from '@/components/wordle/hook/useWordleClues/utils';
 import { Word } from '@/components/wordle/Word';
 import { Wordmap } from '@/components/wordle/WordMap';
 
@@ -25,27 +26,6 @@ export const useWordleClues = () => {
   const [wordleClues, setWordleClues] = useState(getInitialCluesState());
 
   const resetClues = () => setWordleClues(getInitialCluesState());
-
-  const orderSuggestions = (suggestions: Word[]) => {
-    const knownLetters = Object.entries(wordleClues)
-      .filter(([, clue]) => clue.status !== LETTER_STATUS.UNKNOWN)
-      .map(([letter]) => letter);
-
-    return suggestions.sort((word1, word2) => {
-      let wordScore1 = 0;
-      let wordScore2 = 0;
-      if (word1.multiLetters) wordScore1 = 5;
-      if (word2.multiLetters) wordScore2 = 5;
-      if (word1.containsMultiletter(knownLetters)) {
-        wordScore1 += 10;
-      }
-      if (word2.containsMultiletter(knownLetters)) {
-        wordScore2 += 10;
-      }
-
-      return wordScore1 > wordScore2 ? 1 : wordScore1 < wordScore2 ? -1 : 0;
-    });
-  };
 
   const getFilterFunctions = useCallback(() => {
     const filterFunctions: Array<(word: Word) => boolean> = [];
@@ -69,14 +49,15 @@ export const useWordleClues = () => {
 
   const suggestions = useMemo(() => {
     const filterFunctions = getFilterFunctions();
-    if (!filterFunctions.length) return allWords;
     const filteredWords = allWords.filter((word) => {
       const falseFunction = filterFunctions.find((func) => {
         return !func(word);
       });
       return Boolean(!falseFunction);
     });
-    return orderSuggestions(filteredWords);
+    const orderedSuggestions = orderSuggestions(filteredWords, wordleClues);
+
+    return orderedSuggestions;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getFilterFunctions, allWords]);
 

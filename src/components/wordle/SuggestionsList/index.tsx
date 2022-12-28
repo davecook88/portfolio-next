@@ -4,7 +4,7 @@ import { SuggestionsListProps } from '@/components/wordle/SuggestionsList/types'
 
 export const SuggestionsList: FC<SuggestionsListProps> = ({ words }) => {
   return (
-    <div className='flex select-none justify-center gap-2 text-center md:w-4/6 '>
+    <div className='flex select-none flex-wrap justify-center gap-2 p-2 text-center md:w-4/6'>
       {words.map((word) => (
         <div
           key={word.string}

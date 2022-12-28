@@ -7,3 +7,5 @@ export type WordleClueEntry = {
 };
 
 export type WordleClueMap = Record<Letter, WordleClueEntry>;
+
+export type LetterPositionFrequencyMap = Map<Index, Map<Letter, number>>;
