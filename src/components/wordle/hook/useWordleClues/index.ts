@@ -11,13 +11,13 @@ import { Word } from '@/components/wordle/Word';
 import { Wordmap } from '@/components/wordle/WordMap';
 
 export const useWordleClues = () => {
-  const allWords = new Wordmap(WORD_LIST).words;
-
+  const [allWords] = useState(new Wordmap(WORD_LIST).words);
   const getInitialCluesState = () =>
     lowerCaseAlphabet.reduce((map, letter) => {
       map[letter.toUpperCase()] = {
         status: LETTER_STATUS.UNKNOWN,
         index: null,
+        notIndex: null,
       };
       return map;
     }, {} as WordleClueMap);
@@ -57,7 +57,11 @@ export const useWordleClues = () => {
       } else if (clue.status === LETTER_STATUS.NOT_IN_WORD) {
         filterFunctions.push((word: Word) => !word.has(letter));
       } else if (clue.status === LETTER_STATUS.IN_WORD) {
-        filterFunctions.push((word: Word) => word.has(letter));
+        filterFunctions.push(
+          (word: Word) =>
+            word.has(letter) &&
+            !clue.notIndex?.find((index) => word.hasAtIndex(letter)(index))
+        );
       }
     }
     return filterFunctions;

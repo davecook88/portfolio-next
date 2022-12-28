@@ -14,17 +14,33 @@ export const LetterBox: FC<LetterBoxProps> = ({
   const clickHandler = () => {
     if (!letter || !clue || !setLetterClue) return;
     if (!clue) {
-      return setLetterClue({ status: LETTER_STATUS.IN_WORD, index: null });
+      return setLetterClue({
+        status: LETTER_STATUS.IN_WORD,
+        index: null,
+        notIndex: [index],
+      });
     }
+    const currentNotIndex = clue.notIndex || [];
     switch (clue.status) {
       case LETTER_STATUS.NOT_IN_WORD:
-        return setLetterClue({ status: LETTER_STATUS.IN_WORD, index: null });
+        return setLetterClue({
+          status: LETTER_STATUS.IN_WORD,
+          index: null,
+          notIndex: [...currentNotIndex, index],
+        });
       case LETTER_STATUS.UNKNOWN:
-        return setLetterClue({ status: LETTER_STATUS.IN_WORD, index: null });
+        // eslint-disable-next-line no-case-declarations
+
+        return setLetterClue({
+          status: LETTER_STATUS.IN_WORD,
+          index: null,
+          notIndex: [...currentNotIndex, index],
+        });
       case LETTER_STATUS.IN_WORD:
         return setLetterClue({
           status: LETTER_STATUS.INDEX_KNOWN,
           index,
+          notIndex: null,
         });
       case LETTER_STATUS.INDEX_KNOWN:
         return setLetterClue({
@@ -32,6 +48,7 @@ export const LetterBox: FC<LetterBoxProps> = ({
             ? LETTER_STATUS.UNKNOWN
             : LETTER_STATUS.NOT_IN_WORD,
           index: null,
+          notIndex: null,
         });
     }
   };

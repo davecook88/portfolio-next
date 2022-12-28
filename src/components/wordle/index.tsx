@@ -19,10 +19,17 @@ const WordleGame = () => {
   } = useWordleGuesses();
 
   const guessCount = useMemo(() => guesses.length, [guesses]);
-  const filteredSuggestions = useMemo(
-    () => suggestions.slice(0, suggestions.length - 1),
-    [guessCount, suggestions]
-  );
+  const filteredSuggestions = useMemo(() => {
+    const previousGuessesSet = new Set(
+      guesses
+        .slice(0, guesses.length - 1)
+        .map((guess) => guess.join('').toLowerCase())
+    );
+    return suggestions
+      .slice(0, 20)
+      .filter((word) => !previousGuessesSet.has(word.string))
+      .slice(0, 10);
+  }, [guessCount, suggestions]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const setUnknownLetters = () => {
@@ -31,7 +38,11 @@ const WordleGame = () => {
       guess.forEach((letter) => {
         const currentClue = getClue(letter);
         if (currentClue.status === LETTER_STATUS.UNKNOWN) {
-          setClue(letter)({ index: null, status: LETTER_STATUS.NOT_IN_WORD });
+          setClue(letter)({
+            index: null,
+            status: LETTER_STATUS.NOT_IN_WORD,
+            notIndex: null,
+          });
         }
       });
     });
@@ -77,7 +88,7 @@ const WordleGame = () => {
   return (
     <div className='container mt-12'>
       <div className='m-auto w-max'>
-        <div className='m-auto w-max'>
+        <div className='m-auto w-max p-2'>
           <button
             className='btn-warning btn'
             onClick={(e) => {
