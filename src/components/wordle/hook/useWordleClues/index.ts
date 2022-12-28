@@ -11,18 +11,8 @@ import { Word } from '@/components/wordle/Word';
 import { Wordmap } from '@/components/wordle/WordMap';
 
 export const useWordleClues = () => {
-  const allWords = useMemo(() => {
-    return new Wordmap(WORD_LIST).words;
-  }, []);
+  const allWords = new Wordmap(WORD_LIST).words;
 
-  /*
-WordleClueContext is a map with each letter as an entry as an associated number.
-
-If the letter has not yet been guessed, its value is -9
-If the letter has a known index, it's value will be the index (0-4)
-If the letter exists but has no known index, its value will be -1
-If the letter does not exist, its value will be -2
-*/
   const [wordleClues, setWordleClues] = useState(
     lowerCaseAlphabet.reduce((map, letter) => {
       map[letter.toUpperCase()] = {
@@ -32,6 +22,27 @@ If the letter does not exist, its value will be -2
       return map;
     }, {} as WordleClueMap)
   );
+
+  const orderSuggestions = (suggestions: Word[]) => {
+    const knownLetters = Object.entries(wordleClues)
+      .filter(([, clue]) => clue.status !== LETTER_STATUS.UNKNOWN)
+      .map(([letter]) => letter);
+
+    return suggestions.sort((word1, word2) => {
+      let wordScore1 = 0;
+      let wordScore2 = 0;
+      if (word1.multiLetters) wordScore1 = 5;
+      if (word2.multiLetters) wordScore2 = 5;
+      if (word1.containsMultiletter(knownLetters)) {
+        wordScore1 += 10;
+      }
+      if (word2.containsMultiletter(knownLetters)) {
+        wordScore2 += 10;
+      }
+
+      return wordScore1 > wordScore2 ? 1 : wordScore1 < wordScore2 ? -1 : 0;
+    });
+  };
 
   const getFilterFunctions = useCallback(() => {
     const filterFunctions: Array<(word: Word) => boolean> = [];
@@ -49,10 +60,6 @@ If the letter does not exist, its value will be -2
     return filterFunctions;
   }, [wordleClues]);
 
-  // const orderSuggestions = (word1: Word[], word2: Word[]) => {
-  //   const
-  // };
-
   const suggestions = useMemo(() => {
     const filterFunctions = getFilterFunctions();
     if (!filterFunctions.length) return allWords;
@@ -62,7 +69,8 @@ If the letter does not exist, its value will be -2
       });
       return Boolean(!falseFunction);
     });
-    return filteredWords;
+    return orderSuggestions(filteredWords);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getFilterFunctions, allWords]);
 
   const setClue = (letter: Letter) => (clue: WordleClueEntry) => {

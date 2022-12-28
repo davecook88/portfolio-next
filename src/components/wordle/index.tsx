@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 
 import { GUESSES_COUNT, WORD_LENGTH } from '@/components/wordle/constants/game';
+import { LETTER_STATUS } from '@/components/wordle/constants/letterStatus';
 import { GuessRow } from '@/components/wordle/GuessRow';
 import { useWordleClues } from '@/components/wordle/hook/useWordleClues';
 import { useWordleGuesses } from '@/components/wordle/hook/useWordleGuesses';
@@ -11,11 +12,26 @@ const WordleGame = () => {
   const { guesses, addGuessLetter, removeGuessLetter, addGuess, currentGuess } =
     useWordleGuesses();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const setUnknownLetters = () => {
+    const previousGuesses = guesses.slice(0, guesses.length);
+    previousGuesses.forEach((guess) => {
+      guess.forEach((letter) => {
+        const currentClue = getClue(letter);
+        if (currentClue.status === LETTER_STATUS.UNKNOWN) {
+          setClue(letter)({ index: null, status: LETTER_STATUS.NOT_IN_WORD });
+        }
+      });
+    });
+  };
+
   const onGuessClick = useCallback(() => {
     if (!currentGuess || currentGuess.length !== WORD_LENGTH) {
       return onWordTooShort();
     }
     addGuess();
+    setUnknownLetters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addGuess, currentGuess]);
 
   const onKeyDownEventListener = useCallback(

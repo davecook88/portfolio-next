@@ -17,6 +17,8 @@ export const LetterBox: FC<LetterBoxProps> = ({
       return setLetterClue({ status: LETTER_STATUS.IN_WORD, index: null });
     }
     switch (clue.status) {
+      case LETTER_STATUS.NOT_IN_WORD:
+        return setLetterClue({ status: LETTER_STATUS.IN_WORD, index: null });
       case LETTER_STATUS.UNKNOWN:
         return setLetterClue({ status: LETTER_STATUS.IN_WORD, index: null });
       case LETTER_STATUS.IN_WORD:
@@ -25,7 +27,12 @@ export const LetterBox: FC<LetterBoxProps> = ({
           index,
         });
       case LETTER_STATUS.INDEX_KNOWN:
-        return setLetterClue({ status: LETTER_STATUS.UNKNOWN, index: null });
+        return setLetterClue({
+          status: activeGuess
+            ? LETTER_STATUS.UNKNOWN
+            : LETTER_STATUS.NOT_IN_WORD,
+          index: null,
+        });
     }
   };
 
@@ -33,7 +40,7 @@ export const LetterBox: FC<LetterBoxProps> = ({
     <div
       className={clsx(
         'm-1 cursor-pointer border border-white',
-        activeGuess && 'bg-white'
+        activeGuess && 'bg-white text-black'
       )}
       onClick={(e) => {
         e.preventDefault();

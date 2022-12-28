@@ -12,6 +12,14 @@ export class Word {
     this.letterMap = this.getLettersMap(lettersArray);
   }
 
+  containsMultiletter(letters: Letter[]) {
+    if (!this.multiLetters) return false;
+    for (const letter of letters) {
+      if (this.multiLetters.has(letter)) return true;
+    }
+    return false;
+  }
+
   private getLettersSet(letters: Letter[]) {
     const set = new Set();
     letters.forEach((l) => {
