@@ -5,6 +5,8 @@ import { WORD_LENGTH } from '@/components/wordle/constants/game';
 export const useWordleGuesses = () => {
   const [guesses, setGuesses] = useState<string[][]>([]);
 
+  const resetGuesses = () => setGuesses([]);
+
   const currentGuess = guesses[guesses.length - 1] as string[];
 
   const addGuessLetter = useCallback(
@@ -41,5 +43,6 @@ export const useWordleGuesses = () => {
     guesses,
     addGuess,
     currentGuess,
+    resetGuesses,
   };
 };

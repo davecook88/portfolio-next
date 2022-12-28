@@ -13,15 +13,18 @@ import { Wordmap } from '@/components/wordle/WordMap';
 export const useWordleClues = () => {
   const allWords = new Wordmap(WORD_LIST).words;
 
-  const [wordleClues, setWordleClues] = useState(
+  const getInitialCluesState = () =>
     lowerCaseAlphabet.reduce((map, letter) => {
       map[letter.toUpperCase()] = {
         status: LETTER_STATUS.UNKNOWN,
         index: null,
       };
       return map;
-    }, {} as WordleClueMap)
-  );
+    }, {} as WordleClueMap);
+
+  const [wordleClues, setWordleClues] = useState(getInitialCluesState());
+
+  const resetClues = () => setWordleClues(getInitialCluesState());
 
   const orderSuggestions = (suggestions: Word[]) => {
     const knownLetters = Object.entries(wordleClues)
@@ -87,5 +90,6 @@ export const useWordleClues = () => {
     suggestions,
     setClue,
     getClue,
+    resetClues,
   };
 };

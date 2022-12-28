@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { GUESSES_COUNT, WORD_LENGTH } from '@/components/wordle/constants/game';
 import { LETTER_STATUS } from '@/components/wordle/constants/letterStatus';
@@ -8,9 +8,21 @@ import { useWordleGuesses } from '@/components/wordle/hook/useWordleGuesses';
 import { SuggestionsList } from '@/components/wordle/SuggestionsList';
 
 const WordleGame = () => {
-  const { getClue, setClue, suggestions } = useWordleClues();
-  const { guesses, addGuessLetter, removeGuessLetter, addGuess, currentGuess } =
-    useWordleGuesses();
+  const { getClue, setClue, suggestions, resetClues } = useWordleClues();
+  const {
+    guesses,
+    addGuessLetter,
+    removeGuessLetter,
+    addGuess,
+    currentGuess,
+    resetGuesses,
+  } = useWordleGuesses();
+
+  const guessCount = useMemo(() => guesses.length, [guesses]);
+  const filteredSuggestions = useMemo(
+    () => suggestions.slice(0, suggestions.length - 1),
+    [guessCount, suggestions]
+  );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const setUnknownLetters = () => {
@@ -64,7 +76,19 @@ const WordleGame = () => {
 
   return (
     <div className='container mt-12'>
-      <div className='flex justify-center'>
+      <div className='m-auto w-max'>
+        <div className='m-auto w-max'>
+          <button
+            className='btn-warning btn'
+            onClick={(e) => {
+              e.preventDefault();
+              resetClues();
+              resetGuesses();
+            }}
+          >
+            Reset
+          </button>
+        </div>
         <div>
           {[...Array(GUESSES_COUNT).keys()].map((i) => (
             <GuessRow
@@ -88,8 +112,8 @@ const WordleGame = () => {
           Guess
         </button>
       </div>
-      <div>
-        <SuggestionsList words={suggestions.slice(0, 5)} />
+      <div className='m-auto flex justify-center'>
+        <SuggestionsList words={filteredSuggestions} />
       </div>
     </div>
   );
