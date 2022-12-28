@@ -10,6 +10,7 @@ import { SuggestionsList } from '@/components/wordle/SuggestionsList';
 const WordleGame = () => {
   const { getClue, setClue, suggestions, resetClues } = useWordleClues();
   const {
+    addGuessWord,
     guesses,
     addGuessLetter,
     removeGuessLetter,
@@ -125,7 +126,10 @@ const WordleGame = () => {
         </button>
       </div>
       <div className='m-auto flex justify-center'>
-        <SuggestionsList words={filteredSuggestions} />
+        <SuggestionsList
+          words={filteredSuggestions}
+          addGuessWord={addGuessWord}
+        />
       </div>
     </div>
   );

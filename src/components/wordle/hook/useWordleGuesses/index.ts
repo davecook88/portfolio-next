@@ -37,7 +37,14 @@ export const useWordleGuesses = () => {
     setGuesses((prev) => [...prev, []]);
   };
 
+  const addGuessWord = (word: string) => {
+    if (word.length !== 5) return;
+
+    setGuesses([...guesses.slice(0, guesses.length - 1), word.split('')]);
+  };
+
   return {
+    addGuessWord,
     addGuessLetter,
     removeGuessLetter,
     guesses,
